@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="supersizeone">34sp</dimen>
+    <dimen name="bigtitlesize">24sp</dimen>
+    <dimen name="appbarsize">20sp</dimen>
+    <dimen name="smalltitlesize">16sp</dimen>
+    <dimen name="textsize">14sp</dimen>
+    <dimen name="buttonsize">14sp</dimen>
+    <dimen name="tipsize">12sp</dimen>
+</resources>

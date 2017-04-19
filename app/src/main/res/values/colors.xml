@@ -2,5 +2,10 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#fd39a653</color>
+    <color name="colorLoginBack">#535453</color>
+    <color name="selector_white">#ffffff</color>
+    <color name="selector_gray">#868b86</color>
+    <color name="colorButtongreen">#fd39a653</color>
+    <color name="colorTextHint">#d2c4c4</color>
 </resources>
