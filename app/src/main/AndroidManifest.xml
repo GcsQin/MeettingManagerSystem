@@ -35,6 +35,7 @@
         <activity android:name=".actlogin.PhoneLoginActivity" />
         <activity android:name=".actlogin.EmailLoginActivity" />
         <activity android:name=".actlogin.RegisterActivity" />
+        <activity android:name=".MainActivity"></activity>
     </application>
 
 </manifest>

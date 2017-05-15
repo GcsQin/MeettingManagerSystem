@@ -19,12 +19,13 @@
         android:textColor="#ffffff"
         android:textSize="@dimen/bigtitlesize"
         android:layout_marginTop="25dp"
+        android:id="@+id/et_yanzLoginNum"
         />
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
-        android:text="@string/login_phonepassword"
+        android:text="验证码"
         android:textSize="@dimen/appbarsize"
         android:layout_marginTop="25dp"
         />
@@ -33,6 +34,7 @@
             android:layout_height="wrap_content"
             android:textColor="#ffffff"
             android:textSize="@dimen/bigtitlesize"
+            android:id="@+id/et_yanzLoginCode"
             android:layout_marginTop="25dp"
             android:hint="请输入短信验证码"
             android:textColorHint="#c2acac"
@@ -45,20 +47,13 @@
             android:textColor="#ffffff"
             android:text="@string/login_getyanzhengma"
             />
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:text="忘记密码?"-->
-        <!--android:layout_marginTop="20dp"-->
-        <!--android:textSize="@dimen/smalltitlesize"-->
-        <!--android:textColor="@color/selector_gray"-->
-        <!--/>-->
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/login_phonebtn"
         android:textColor="#ffffff"
         android:layout_marginTop="20dp"
+        android:id="@+id/btn_yanZLogin"
         android:background="@drawable/shape_login_btn"
         />
 </LinearLayout>

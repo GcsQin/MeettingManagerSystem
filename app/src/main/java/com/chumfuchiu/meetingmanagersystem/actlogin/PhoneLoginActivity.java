@@ -2,10 +2,13 @@ package com.chumfuchiu.meetingmanagersystem.actlogin;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.IdRes;
 import android.support.annotation.RequiresApi;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +32,9 @@ import com.chumfuchiu.meetingmanagersystem.utils.ActivityManager;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-
+/*
+* 手机登录页面
+* */
 public class PhoneLoginActivity extends AppCompatActivity {
     PassLoginFragment passLoginFragment;
     YanzhengLoginFragment yanzhengLoginFragment;
@@ -48,11 +53,11 @@ public class PhoneLoginActivity extends AppCompatActivity {
             decorView.setSystemUiVisibility(option);
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
-        getSupportActionBar().hide();
         initDatas();
         initView();
     }
     protected void initDatas(){
+        //初始化我们的fragment容器，将我们的fragment加入到容器中。
         basePagerFragments=new ArrayList<BasePagerFragment>();
         passLoginFragment=new PassLoginFragment(PhoneLoginActivity.this);
         basePagerFragments.add(passLoginFragment);
@@ -60,6 +65,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
         basePagerFragments.add(yanzhengLoginFragment);
     }
     protected void initView(){
+        //获取radioGroup对象并且为其设置radioButton的单选响应事件，与viewPager进行绑定。
         radioGroup= (RadioGroup) findViewById(R.id.rg_phonelogin);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -103,33 +109,47 @@ public class PhoneLoginActivity extends AppCompatActivity {
             }
         });
     }
-    class  LoginPagerAdapter extends PagerAdapter{
+    public void backToLogin(View view){
+        startActivity(new Intent(PhoneLoginActivity.this,LoginActivity.class));
+    }
+    class LoginPagerAdapter extends FragmentPagerAdapter{
+        public LoginPagerAdapter(android.support.v4.app.FragmentManager fm) {
+            super(fm);
+        }
+        @Override
+        public Fragment getItem(int position) {
+            return null;
+        }
         @Override
         public int getCount() {
-            return basePagerFragments.size();
-        }
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view==object;
-        }
-
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            Log.e("PhoneLoginActivity","--------"+position);
-            BasePagerFragment basePagerFragment=basePagerFragments.get(position);
-            if(basePagerFragment.rootView!=null){
-                container.addView(basePagerFragment.rootView);
-            }else {
-                Log.e("PhoneLoginActivity","view--------null"+position);
-            }
-            return basePagerFragment.rootView;
-        }
-
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View)object);
+            return 0;
         }
     }
+//    class  LoginPagerAdapter extends PagerAdapter{
+//        @Override
+//        public int getCount() {
+//            return basePagerFragments.size();
+//        }
+//        @Override
+//        public boolean isViewFromObject(View view, Object object) {
+//            return view==object;
+//        }
+//
+//        @Override
+//        public Object instantiateItem(ViewGroup container, int position) {
+//            BasePagerFragment basePagerFragment=basePagerFragments.get(position);
+//            if(basePagerFragment.rootView!=null){
+//                container.addView(basePagerFragment.rootView);
+//            }else {
+//                Log.e("PhoneLoginActivity","view--------null"+position);
+//            }
+//            return basePagerFragment.rootView;
+//        }
+//        @Override
+//        public void destroyItem(ViewGroup container, int position, Object object) {
+//            container.removeView((View)object);
+//        }
+//    }
     @Override
     protected void onDestroy() {
         super.onDestroy();

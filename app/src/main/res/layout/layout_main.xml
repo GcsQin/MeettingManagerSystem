@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+    <!--注意这个MainActivity的vertical一定要写，不然toolbar的按钮显示不出来-->
+    <!--头部-->
+    <include layout="@layout/layout_main_toolbar"></include>
+    <!--主要布局-->
+    <include layout="@layout/layout_main_drawablelayout"></include>
+</LinearLayout>

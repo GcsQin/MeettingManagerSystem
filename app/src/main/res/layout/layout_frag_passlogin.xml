@@ -18,6 +18,7 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:textSize="@dimen/bigtitlesize"
+        android:id="@+id/et_passloginPhone"
         android:layout_marginTop="25dp"
         />
     <TextView
@@ -33,6 +34,7 @@
         android:layout_height="wrap_content"
         android:textColor="#ffffff"
         android:textSize="@dimen/bigtitlesize"
+        android:id="@+id/et_passloginPass"
         android:layout_marginTop="25dp"
         android:hint="至少6位"
         android:textColorHint="#c2acac"
@@ -51,6 +53,7 @@
         android:layout_height="wrap_content"
         android:text="@string/login_phonebtn"
         android:textColor="#ffffff"
+        android:id="@+id/btn_passloginButton"
         android:layout_marginTop="20dp"
         android:background="@drawable/shape_login_btn"
         />

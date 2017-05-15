@@ -11,6 +11,7 @@
         android:background="@null"
         android:layout_marginTop="36sp"
         android:layout_marginLeft="20sp"
+        android:onClick="backToLogin"
         android:id="@+id/phonelogin_btn_back"
         />
     <LinearLayout
