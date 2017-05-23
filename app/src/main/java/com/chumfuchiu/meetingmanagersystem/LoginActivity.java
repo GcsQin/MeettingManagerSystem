@@ -11,6 +11,7 @@ import android.view.View;
 import com.chumfuchiu.meetingmanagersystem.actlogin.EmailLoginActivity;
 import com.chumfuchiu.meetingmanagersystem.actlogin.PhoneLoginActivity;
 import com.chumfuchiu.meetingmanagersystem.actlogin.RegisterActivity;
+import com.chumfuchiu.meetingmanagersystem.actlogin.UserNameActivity;
 import com.chumfuchiu.meetingmanagersystem.utils.ActivityManager;
 /*
 * 登录方式选择界面
@@ -39,12 +40,15 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(new Intent(LoginActivity.this, EmailLoginActivity.class));
         overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
     }
+    public void loginByUserName(View view){
+        startActivity(new Intent(LoginActivity.this, UserNameActivity.class));
+        overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
+    }
     //用户注册页面
     public void userRegister(View view){
         startActivity(new Intent(LoginActivity.this, RegisterActivity.class));
         overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

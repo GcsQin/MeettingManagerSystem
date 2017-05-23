@@ -24,7 +24,6 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        getSupportActionBar().hide();
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.layout_splash);
         //初始化bmobSDK
@@ -82,7 +81,6 @@ public class SplashActivity extends AppCompatActivity {
     }
     //跳转登录界面
     private void enterLoginAct(){
-//        startActivity(new Intent(SplashActivity.this,MainActivity.class));
         startActivity(new Intent(SplashActivity.this,LoginActivity.class));
         overridePendingTransition(android.R.anim.fade_in,android.R.anim.fade_out);
         finish();

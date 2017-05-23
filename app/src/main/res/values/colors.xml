@@ -8,4 +8,6 @@
     <color name="selector_gray">#868b86</color>
     <color name="colorButtongreen">#fd39a653</color>
     <color name="colorTextHint">#d2c4c4</color>
+    <color name="colorMenu">#3C3F41</color>
+    <color name="colorRedYun">#C62F2F</color>
 </resources>

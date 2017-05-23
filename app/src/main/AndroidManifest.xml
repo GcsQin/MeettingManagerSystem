@@ -35,7 +35,9 @@
         <activity android:name=".actlogin.PhoneLoginActivity" />
         <activity android:name=".actlogin.EmailLoginActivity" />
         <activity android:name=".actlogin.RegisterActivity" />
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
+        <activity android:name=".actlogin.UserNameActivity" />
+        <activity android:name=".RoomDetialsActivity"></activity>
     </application>
 
 </manifest>

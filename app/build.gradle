@@ -27,7 +27,11 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:25.3.1'
     //bmob
-    compile 'cn.bmob.android:bmob-sdk:3.5.0'
+    compile('cn.bmob.android:bmob-sdk:3.5.0') {
+        exclude group: 'com.squareup.okhttp3'
+        exclude group: 'com.google.gson'
+        exclude group: 'com.squareup.okio'
+    }
     compile 'cn.bmob.android:bmob-push:0.8'
     //推送
     compile 'cn.bmob.android:bmob-im:2.0.5@aar'
@@ -39,4 +43,5 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.7.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.android.support:recyclerview-v7:25.3.1'
 }

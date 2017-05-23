@@ -1,35 +1,25 @@
 package com.chumfuchiu.meetingmanagersystem.actlogin;
 
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.IdRes;
-import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 
 import com.chumfuchiu.meetingmanagersystem.LoginActivity;
 import com.chumfuchiu.meetingmanagersystem.R;
 import com.chumfuchiu.meetingmanagersystem.customview.ScrollCancelViewPager;
-import com.chumfuchiu.meetingmanagersystem.fragment.BaseFragment;
 import com.chumfuchiu.meetingmanagersystem.fragment.BasePagerFragment;
 import com.chumfuchiu.meetingmanagersystem.fragment.PassLoginFragment;
 import com.chumfuchiu.meetingmanagersystem.fragment.YanzhengLoginFragment;
 import com.chumfuchiu.meetingmanagersystem.utils.ActivityManager;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 /*
@@ -82,7 +72,7 @@ public class PhoneLoginActivity extends AppCompatActivity {
         });
         viewPager= (ScrollCancelViewPager) findViewById(R.id.login_viewpager);
         viewPager.setCurrentItem(0);
-        viewPager.setAdapter(new LoginPagerAdapter());
+        viewPager.setAdapter(new LoginPagerAdapter(getSupportFragmentManager()));
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
@@ -118,38 +108,13 @@ public class PhoneLoginActivity extends AppCompatActivity {
         }
         @Override
         public Fragment getItem(int position) {
-            return null;
+            return basePagerFragments.get(position);
         }
         @Override
         public int getCount() {
-            return 0;
+            return basePagerFragments.size();
         }
     }
-//    class  LoginPagerAdapter extends PagerAdapter{
-//        @Override
-//        public int getCount() {
-//            return basePagerFragments.size();
-//        }
-//        @Override
-//        public boolean isViewFromObject(View view, Object object) {
-//            return view==object;
-//        }
-//
-//        @Override
-//        public Object instantiateItem(ViewGroup container, int position) {
-//            BasePagerFragment basePagerFragment=basePagerFragments.get(position);
-//            if(basePagerFragment.rootView!=null){
-//                container.addView(basePagerFragment.rootView);
-//            }else {
-//                Log.e("PhoneLoginActivity","view--------null"+position);
-//            }
-//            return basePagerFragment.rootView;
-//        }
-//        @Override
-//        public void destroyItem(ViewGroup container, int position, Object object) {
-//            container.removeView((View)object);
-//        }
-//    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
