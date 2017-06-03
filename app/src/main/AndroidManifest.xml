@@ -75,7 +75,9 @@
         <!-- 即时通讯 -->
         <activity android:name=".BorrowActivity" />
         <activity android:name=".ApplyHandleActivity" />
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".UserApplyActivity" />
+        <activity android:name=".BestApplyActivity"></activity>
     </application>
 
 </manifest>

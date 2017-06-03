@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    >
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="用户邮箱认证"
+        android:textSize="@dimen/appbarsize"
+        android:gravity="center"
+        android:textColor="@color/base_color_text_black"
+        />
+    <EditText
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/appbarsize"
+        android:textColor="#000000"
+        android:id="@+id/et_email_verify"
+        />
+    <Button
+        android:id="@+id/btn_email_verify"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="点击认证"
+        android:textColor="#ffffff"
+        android:background="@drawable/shape_update_btn_blue"
+        />
+</LinearLayout>

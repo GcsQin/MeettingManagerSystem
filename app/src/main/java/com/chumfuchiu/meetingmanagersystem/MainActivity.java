@@ -13,19 +13,26 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.chumfuchiu.meetingmanagersystem.adapter.ClassRoomRecyclerAdapter;
 import com.chumfuchiu.meetingmanagersystem.adapter.MenuListAdapter;
+import com.chumfuchiu.meetingmanagersystem.bean.MessageEvent;
 import com.chumfuchiu.meetingmanagersystem.bean.RoomInfo;
 import com.chumfuchiu.meetingmanagersystem.bean.UserInfo;
 import com.chumfuchiu.meetingmanagersystem.decoration.RecyclerViewSpaceItemDecoration;
 import com.chumfuchiu.meetingmanagersystem.utils.ActivityManager;
 import com.chumfuchiu.meetingmanagersystem.utils.ToastUitls;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,6 +48,7 @@ import cn.bmob.v3.datatype.BatchResult;
 import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.QueryListListener;
+import cn.bmob.v3.listener.SaveListener;
 import cn.bmob.v3.listener.UpdateListener;
 
 /*
@@ -59,20 +67,28 @@ public class MainActivity extends AppCompatActivity {
     TextView tvUserName,tvUserPhone,tvUserEmail,tvUserPermission;
     ListView listView;
     private ArrayList<RoomInfo> roomInfoArrayList;
+
+    UserInfo userInfo;
     Integer permission;
     MenuListAdapter menuListAdapter;
     String[] user=new String[]{"邮箱中心","我预约的","最佳预约","退出登录"};
-    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","预约管理","一键空闲","退出登录"};
+    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","预约管理","一键空闲","添加教室","退出登录"};
     //更新对话框
     EditText etBuild,etRoomNum,etSource,etState,etSize;
     Boolean isUpdateSuccess=null;
     String roomUpSource,roomUpState,upSize;
     //申请信息
     ArrayList<RoomInfo> applyRoomList;
+    //添加新教室
+    Spinner spinner;
+    EditText etAddRommNum,etAddSource,etAddState,etAddSize;
+    Button btnAddNewRoom;
+    String adDBuild="";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_main);
+        EventBus.getDefault().register(this);
         ActivityManager.addActivityIntoActManagger(MainActivity.this);
         roomInfoArrayList=new ArrayList<RoomInfo>();
         initViews();
@@ -82,7 +98,7 @@ public class MainActivity extends AppCompatActivity {
         getDataFromServer();
     }
     private void justCurrentUser(){
-        UserInfo userInfo= BmobUser.getCurrentUser(UserInfo.class);
+        userInfo= BmobUser.getCurrentUser(UserInfo.class);
         if(userInfo!=null){
             String userName=userInfo.getUsername();
             if(userName!=null){
@@ -97,6 +113,7 @@ public class MainActivity extends AppCompatActivity {
                 tvUserEmail.setText("邮箱:"+userInfo.getEmail());
             }else {
                 tvUserEmail.setText("邮箱：未认证");
+                Log.e("getEmailVerified()","==="+userInfo.getEmailVerified());
             }
             permission=userInfo.getPermission();
             if(permission==1001){
@@ -160,8 +177,8 @@ public class MainActivity extends AppCompatActivity {
         mToggle.syncState();
     }
     private void getDataFromServer(){
+        roomInfoArrayList.clear();
         BmobQuery<RoomInfo> roomInfoBmobQuery=new BmobQuery<RoomInfo>();
-
         roomInfoBmobQuery.setLimit(2017);
         roomInfoBmobQuery.findObjects(new FindListener<RoomInfo>() {
             @Override
@@ -196,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent=new Intent(MainActivity.this,RoomDetialsActivity.class);
                 intent.putExtra("roomInfo",roomInfoArrayList.get(postion));
                 startActivity(intent);
-                ToastUitls.showLongToast(getApplicationContext(),"单点击了第"+postion+"个view");
+//                ToastUitls.showLongToast(getApplicationContext(),"单点击了第"+postion+"个view");
             }
         });
         roomRecyclerAdapter.setOnRecyclerViewItemLongClickListener(new ClassRoomRecyclerAdapter.OnRecyclerViewItemLongClickListener() {
@@ -342,7 +359,10 @@ public class MainActivity extends AppCompatActivity {
             });
         return isUpdateSuccess;
     }
-
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void refreshRecyclerView(MessageEvent messageEvent){
+        getDataFromServer();
+    }
     @Override
     protected void onResume() {
         super.onResume();
@@ -352,6 +372,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().unregister(this);
         ActivityManager.delActivityIntoActManager(MainActivity.this);
     }
     class UserItemClickListener implements AdapterView.OnItemClickListener {
@@ -359,10 +380,13 @@ public class MainActivity extends AppCompatActivity {
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             switch (i){
                 case 0:
+                    showEmailVerifyDialog();
                     break;
                 case 1:
+                    queryUserApply();
                     break;
                 case 2:
+                    enterBestApply();
                     break;
                 case 3:
                     logOut();
@@ -371,26 +395,78 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    private void showEmailVerifyDialog(){
+        final EditText etEmail;
+        Button btnEmail;
+        AlertDialog.Builder builder=new AlertDialog.Builder(this);
+        View view=View.inflate(getApplicationContext(),R.layout.custom_dialog_email_verify,null);
+        builder.setView(view);
+        final Dialog dialog=builder.create();
+        dialog.setCancelable(true);
+        etEmail= (EditText) view.findViewById(R.id.et_email_verify);
+        btnEmail= (Button) view.findViewById(R.id.btn_email_verify);
+        btnEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                final String email=etEmail.getText().toString();
+                if(email.isEmpty()){
+                    ToastUitls.showLongToast(getApplicationContext(),"邮箱不能为空,请填写。");
+                }else {
+                    userInfo.setEmail(email);
+                    userInfo.update(new UpdateListener() {
+                        @Override
+                        public void done(BmobException e) {
+                            if(e==null){
+                                ToastUitls.showLongToast(getApplicationContext(),"请求验证邮件成功,请到"+email+"中进行激活。");
+                                dialog.dismiss();
+                            }else {
+                                ToastUitls.showLongToast(getApplicationContext(),"失败"+e.getMessage()+"("+e.getErrorCode()+")");
+                                dialog.dismiss();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        dialog.show();
+    }
+    private void queryUserApply(){
+        startActivity(new Intent(MainActivity.this,UserApplyActivity.class));
+    }
+    private void enterBestApply(){
+        startActivity(new Intent(MainActivity.this,BestApplyActivity.class));
+    }
     class AdminItemClickListener implements AdapterView.OnItemClickListener{
 
         @Override
         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
             switch (i){
                 case 0:
+                    showEmailVerifyDialog();
+                    Log.e("======","showEmailVerifyDialog()");
                     break;
                 case 1:
+                    queryUserApply();
+                    Log.e("======","queryUserApply();");
                     break;
                 case 2:
-
+                    enterBestApply();
+                    Log.e("======","enterBestApply();");
                     break;
                 case 3:
                     handerAppylyInfos();
+                    Log.e("======","handerAppylyInfos();");
                     break;
                 case 4:
                     oneKeyRelease();
                     drawerLayout.closeDrawers();
+                    Log.e("======","oneKeyRelease();");
                     break;
                 case 5:
+                    addNewClassRoom();
+                    Log.e("======","addNewClassRoom()");
+                    break;
+                case 6:
                     logOut();
                     break;
             }
@@ -441,6 +517,63 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+    private void addNewClassRoom(){
+        final String[] spItems=new String[]{"逸夫楼","机电楼","教学楼"};
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        View viewDialog=View.inflate(getApplicationContext(),R.layout.custom_dialog_add_new_room,null);
+        builder.setView(viewDialog);
+        final Dialog dialog=builder.create();
+        spinner= (Spinner) viewDialog.findViewById(R.id.sp_addnew_room);
+        ArrayAdapter<String> adapter=new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item,spItems);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                adDBuild=spItems[i];
+            }
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+                adDBuild="逸夫楼";
+            }
+        });
+        etAddRommNum= (EditText) viewDialog.findViewById(R.id.et_addnew_roomnum);
+        etAddSize= (EditText) viewDialog.findViewById(R.id.et_addnew_size);
+        etAddSource= (EditText) viewDialog.findViewById(R.id.et_addnew_source);
+        btnAddNewRoom= (Button) viewDialog.findViewById(R.id.btn_add_roomInfo);
+        btnAddNewRoom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String num=etAddRommNum.getText().toString();
+                String size=etAddSize.getText().toString();
+                String source=etAddSource.getText().toString();
+                addAnewRoom(adDBuild,num,Integer.parseInt(size),source,dialog);
+            }
+        });
+        dialog.show();
+    }
+    private void addAnewRoom(String adDBuild, String num, int size, String source, final Dialog dialog){
+        if(!num.isEmpty()&&size>=0&&!num.isEmpty()&&!source.isEmpty()){
+            RoomInfo roomInfo=new RoomInfo();
+            roomInfo.setBuildingOfRoom(adDBuild);
+            roomInfo.setPersonsOfRoom(size);
+            roomInfo.setNumberOfRoom(num);
+            roomInfo.setResourceOfRoom(source);
+            roomInfo.save(new SaveListener<String>() {
+                @Override
+                public void done(String s, BmobException e) {
+                    if(e==null){
+                        ToastUitls.showLongToast(getApplicationContext(),"添加教室成功！");
+                        dialog.dismiss();
+                    }else {
+                        ToastUitls.showLongToast(getApplicationContext(),"操作失败"+e.getMessage());
+                        dialog.dismiss();
+                    }
+                }
+            });
+        }else {
+            ToastUitls.showLongToast(getApplicationContext(),"所填信息不能为空！");
+        }
+    }
     private void logOut(){
         //即使通讯连接断开
         BmobIM.getInstance().disConnect();
@@ -468,4 +601,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
 }

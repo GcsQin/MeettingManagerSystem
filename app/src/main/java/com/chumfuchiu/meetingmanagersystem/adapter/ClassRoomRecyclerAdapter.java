@@ -97,7 +97,10 @@ public class ClassRoomRecyclerAdapter extends RecyclerView.Adapter<ClassRoomRecy
         return false;
     }
     public void addItem(final int position){
-
+        if(mRoomInfoArrayList==null){
+            mRoomInfoArrayList=new ArrayList<RoomInfo>();
+        }
+//        mRoomInfoArrayList.add()
     }
     public void deleteItem(){
 
