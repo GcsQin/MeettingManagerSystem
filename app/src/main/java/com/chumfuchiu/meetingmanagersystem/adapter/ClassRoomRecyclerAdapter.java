@@ -55,6 +55,8 @@ public class ClassRoomRecyclerAdapter extends RecyclerView.Adapter<ClassRoomRecy
             holder.rootView.setBackgroundColor(Color.parseColor("#139D57"));
         }else if(roomInfo.getStateOfRoom().equals("空闲中")){
             holder.rootView.setBackgroundColor(Color.parseColor("#C7C4C9"));
+        }else if (roomInfo.getStateOfRoom().equals("申请中")){
+            holder.rootView.setBackgroundColor(Color.parseColor("#FEC7DE"));
         }else {
             holder.rootView.setBackgroundColor(Color.parseColor("#ff0000"));
         }

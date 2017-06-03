@@ -9,14 +9,28 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.chumfuchiu.meetingmanagersystem.bean.RoomInfo;
+import com.chumfuchiu.meetingmanagersystem.bean.UserInfo;
 import com.chumfuchiu.meetingmanagersystem.utils.ActivityManager;
+import com.chumfuchiu.meetingmanagersystem.utils.ToastUitls;
 
-public class RoomDetialsActivity extends AppCompatActivity {
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.bean.BmobIMConversation;
+import cn.bmob.newim.bean.BmobIMUserInfo;
+import cn.bmob.v3.BmobUser;
+
+/*
+* 当用户点击一个教室后进入该页面，该页面显示了详细的教室信息
+*
+*
+* */
+public class RoomDetialsActivity extends BaseActivity {
     TextView tvBuinding,tvRoomNum,tvRoomState,tvRoomSource,tvRoomSize,
             tvUsingPerson,tvUsingTime,tvUsingReason;
     Button button;
     RoomInfo roomInfo;
     String state;
+    UserInfo userInfo;
+    BmobIMUserInfo imInfo;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,7 +42,13 @@ public class RoomDetialsActivity extends AppCompatActivity {
         if(roomInfo!=null){
             initViewData();
         }
-
+        if(roomInfo.getUsingPersonid()!=null){
+            if(roomInfo.getUsingPersonid().equals(BmobUser.getCurrentUser(UserInfo.class).getObjectId())){
+                button.setVisibility(View.INVISIBLE);
+            }
+        }
+        //構造聊天方用戶信息：傳入用戶id、用戶名和用戶頭像三個參數
+        imInfo=new BmobIMUserInfo(roomInfo.getUsingPersonid(),roomInfo.getUsingPerson(),roomInfo.getUsingPersonAvatar());
     }
     private void initViews(){
         tvBuinding= (TextView) findViewById(R.id.tv_roomdetials_building);
@@ -60,18 +80,27 @@ public class RoomDetialsActivity extends AppCompatActivity {
             button.setText("与他协商");
             Log.e("Button","========使用");
         }else {
-            Log.e("Button","========其他");
         }
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if(state.equals("空闲中")){
-                    
-                }else if (state.equals("使用中")){
-
+                    Intent intent=new Intent(RoomDetialsActivity.this,BorrowActivity.class);
+                    intent.putExtra("roomInfos",roomInfo);
+                    startActivity(intent);
+                }else if(state.equals("禁用中")){
+                    ToastUitls.showLongToast(getApplicationContext(),"教室处于禁用状态！");
+                }else {
+                    startPrivateConversation();
                 }
             }
         });
+    }
+    private void startPrivateConversation(){
+        BmobIMConversation c=BmobIM.getInstance().startPrivateConversation(imInfo,false,null);
+        Bundle bundle=new Bundle();
+        bundle.putSerializable("c",c);
+        startActivity(ChatActivity.class,bundle,false);
     }
     @Override
     protected void onDestroy() {

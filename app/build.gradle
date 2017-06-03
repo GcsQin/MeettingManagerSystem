@@ -18,6 +18,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+//        exclude 'META-INF/DEPENDENCIES'
+//        exclude 'META-INF/NOTICE'
+//        exclude 'META-INF/LICENSE'
+//        exclude 'META-INF/LICENSE.txt'
+//        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/rxjava.properties'
+    }
 }
 
 dependencies {
@@ -25,23 +33,25 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    //    compile('cn.bmob.android:bmob-sdk:3.5.5') {
+    //            exclude group: 'com.squareup.okhttp3'
+    //            exclude group: 'com.google.code.gson'
+    //        }
     compile 'com.android.support:appcompat-v7:25.3.1'
-    //bmob
-    compile('cn.bmob.android:bmob-sdk:3.5.0') {
-        exclude group: 'com.squareup.okhttp3'
-        exclude group: 'com.google.gson'
-        exclude group: 'com.squareup.okio'
-    }
+    compile 'cn.bmob.android:bmob-sdk:3.5.5'
     compile 'cn.bmob.android:bmob-push:0.8'
-    //推送
-    compile 'cn.bmob.android:bmob-im:2.0.5@aar'
+    compile 'cn.bmob.android:bmob-im:2.0.6@aar'
     compile 'cn.bmob.android:bmob-sms:1.0.1'
     compile 'cn.bmob.android:http-legacy:1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:support-v4:25.3.1'
-    testCompile 'junit:junit:4.12'
-    compile 'com.squareup.okhttp3:okhttp:3.7.0'
-    compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.android.support:recyclerview-v7:25.3.1'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
+    compile 'com.google.code.gson:gson:2.8.0'
+    compile 'cn.aigestudio.datepicker:DatePicker:2.2.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
+    compile 'com.orhanobut:logger:1.4'
+    compile 'com.github.bumptech.glide:glide:3.7.0'
+    testCompile 'junit:junit:4.12'
 }

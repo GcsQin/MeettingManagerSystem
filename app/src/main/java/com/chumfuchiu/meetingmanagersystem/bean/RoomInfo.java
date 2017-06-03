@@ -19,6 +19,24 @@ public class RoomInfo extends BmobObject implements Serializable{
     private String usingTime;
     private String usingReason;
     private String usingPerson;
+    private String usingPersonid;
+    private String usingPersonAvatar;
+
+    public String getUsingPersonid() {
+        return usingPersonid;
+    }
+
+    public void setUsingPersonid(String usingPersonid) {
+        this.usingPersonid = usingPersonid;
+    }
+
+    public String getUsingPersonAvatar() {
+        return usingPersonAvatar;
+    }
+
+    public void setUsingPersonAvatar(String usingPersonAvatar) {
+        this.usingPersonAvatar = usingPersonAvatar;
+    }
 
     public String getUsingTime() {
         return usingTime;

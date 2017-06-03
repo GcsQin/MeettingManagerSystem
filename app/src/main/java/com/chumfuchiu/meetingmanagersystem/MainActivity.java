@@ -1,6 +1,7 @@
 package com.chumfuchiu.meetingmanagersystem;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Intent;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,6 +13,8 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -28,6 +31,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import cn.bmob.newim.BmobIM;
+import cn.bmob.newim.listener.ConnectListener;
 import cn.bmob.v3.BmobBatch;
 import cn.bmob.v3.BmobObject;
 import cn.bmob.v3.BmobQuery;
@@ -57,7 +62,13 @@ public class MainActivity extends AppCompatActivity {
     Integer permission;
     MenuListAdapter menuListAdapter;
     String[] user=new String[]{"邮箱中心","我预约的","最佳预约","退出登录"};
-    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","管理中心","一键空闲","退出登录"};
+    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","预约管理","一键空闲","退出登录"};
+    //更新对话框
+    EditText etBuild,etRoomNum,etSource,etState,etSize;
+    Boolean isUpdateSuccess=null;
+    String roomUpSource,roomUpState,upSize;
+    //申请信息
+    ArrayList<RoomInfo> applyRoomList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,11 +103,25 @@ public class MainActivity extends AppCompatActivity {
                 tvUserPermission.setText("普通用户");
             }else if (permission==1011){
                 tvUserPermission.setText("管理人员");
+                queryApplyInfo();
             }
             Log.e("MainActivity",userInfo.getUsername()+"==="+userInfo.getMobilePhoneNumber()+"==="+userInfo.getPermission());
         }else {
             Log.e("MainActivity","userInfoIsNull");
         }
+        //链接即使通讯IM
+        BmobIM.connect(userInfo.getObjectId(), new ConnectListener() {
+            @Override
+            public void done(String s, BmobException e) {
+                if(e==null){
+                    ToastUitls.showShortToast(getApplicationContext(),"用户连接通讯服务器成功");
+                    Log.e("BmobIM.connect","用户连接通讯服务器成功");
+                }else {
+                    ToastUitls.showLongToast(getApplicationContext(),"用户连接通讯服务器失败"+e.getMessage()+e.getErrorCode());
+                    Log.e("BmobIM.connect","用户连接通讯服务器失败"+e.getMessage()+e.getErrorCode());
+                }
+            }
+        });
         initMenuListView();
     }
     private void initViews(){
@@ -182,6 +207,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+//        roomRecyclerAdapter.notifyDataSetChanged();
         recyclerView.setAdapter(roomRecyclerAdapter);
     }
     private void initMenuListView(){
@@ -229,7 +255,10 @@ public class MainActivity extends AppCompatActivity {
         tvUpdate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                String objectId=roomInfoArrayList.get(position).getObjectId();
+                RoomInfo roomInfo=roomInfoArrayList.get(position);
+                showUpdateDialog(roomInfo,position);
+                dialog.dismiss();
             }
         });
         tvCannotUse.setOnClickListener(new View.OnClickListener() {
@@ -257,6 +286,69 @@ public class MainActivity extends AppCompatActivity {
         dialog.setView(dialogPermission);
         dialog.show();
     }
+    private void showUpdateDialog(final RoomInfo roomInfo, final int position){
+        final EditText etUpRoomSource,etUpState,etUpSize;
+        Button btnUpdate;
+        AlertDialog.Builder builder=new AlertDialog.Builder(MainActivity.this);
+        View view=View.inflate(getApplicationContext(),R.layout.custom_dialog_update,null);
+        builder.setView(view);
+        etUpRoomSource= (EditText) view.findViewById(R.id.et_update_source);
+        etUpState= (EditText) view.findViewById(R.id.et_update_state);
+        etUpSize= (EditText) view.findViewById(R.id.et_update_size);
+        btnUpdate= (Button) view.findViewById(R.id.btn_update_roomInfo);
+        final Dialog dialog=builder.create();
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                roomUpSource=etUpRoomSource.getText().toString();
+                roomUpState=etUpState.getText().toString();
+                upSize=etUpSize.getText().toString();
+               updateRoomInfo(roomUpSource,roomUpState,upSize,roomInfo,position);
+                if(isUpdateSuccess){
+                    ToastUitls.showLongToast(getApplicationContext(),"更新成功");
+                    dialog.dismiss();
+                }else {
+                    ToastUitls.showLongToast(getApplicationContext(),"更新失败");
+                    dialog.dismiss();
+                }
+            }
+        });
+        dialog.show();
+    }
+    private Boolean updateRoomInfo(String source, String state, String size, RoomInfo roomInfo, final int position){
+            if(!source.isEmpty()){
+                roomInfo.setResourceOfRoom(source);
+            }
+            if(!state.isEmpty()){
+                roomInfo.setStateOfRoom(state);
+            }
+            if(!size.isEmpty()){
+                roomInfo.setPersonsOfRoom(Integer.parseInt(size));
+            }
+            String objectId=roomInfo.getObjectId();
+             roomInfo.update(objectId, new UpdateListener() {
+                @Override
+                public void done(BmobException e) {
+                         if(e==null){
+                             roomRecyclerAdapter.notifyItemRemoved(position);
+                             roomRecyclerAdapter.notifyDataSetChanged();
+                             isUpdateSuccess=true;
+                             Log.e("updateRoomInfo","==="+isUpdateSuccess);
+                         }else {
+                             isUpdateSuccess=false;
+                             Log.e("updateRoomInfo","==="+isUpdateSuccess);
+                         }
+                }
+            });
+        return isUpdateSuccess;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        BmobIM.getInstance().addMessageListHandler();
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -289,17 +381,25 @@ public class MainActivity extends AppCompatActivity {
                 case 1:
                     break;
                 case 2:
+
                     break;
                 case 3:
+                    handerAppylyInfos();
                     break;
                 case 4:
                     oneKeyRelease();
+                    drawerLayout.closeDrawers();
                     break;
                 case 5:
                     logOut();
                     break;
             }
         }
+    }
+    private void handerAppylyInfos(){
+        Intent intent=new Intent(MainActivity.this,ApplyHandleActivity.class);
+        intent.putExtra("applyInfos",applyRoomList);
+        startActivity(intent);
     }
     private void oneKeyRelease(){
         List<BmobObject> roomInfos=new ArrayList<BmobObject>();
@@ -309,20 +409,26 @@ public class MainActivity extends AppCompatActivity {
             roomInfo.setUsingTime("");
             roomInfo.setUsingPerson("");
             roomInfo.setUsingReason("");
+            roomInfo.setUsingPersonid("");
+            roomInfo.setUsingPersonAvatar("");
             roomInfos.add(roomInfo);
         }
         new BmobBatch().updateBatch(roomInfos).doBatch(new QueryListListener<BatchResult>() {
             @Override
             public void done(List<BatchResult> list, BmobException e) {
                 if(e==null){
+                    Log.e("BmobBatch()","======操作成功");
+                    Log.e("BmobBatch()","=========size"+list.size());
                     for(int j=0;j<list.size();j++){
                         BatchResult result=list.get(j);
                         BmobException ex=result.getError();
                         if(ex!=null) {
                             ToastUitls.showLongToast(getApplicationContext(),"一键空闲操作失败(部分数据不成功)");
-                            break;
+                            Log.e("BmobBatch","ex========部分数据不成功"+j);
                         }else {
-                            if(j==list.size()){
+                            Log.e("BmobBatch","ex========部分数据成功"+j);
+                            roomRecyclerAdapter.notifyItemChanged(j);
+                            if(j==list.size()-1){
                                 roomRecyclerAdapter.notifyDataSetChanged();
                                 ToastUitls.showShortToast(getApplicationContext(),"操作成功");
                             }
@@ -330,16 +436,36 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }else {
                     ToastUitls.showLongToast(getApplicationContext(),"操作失败"+e.getMessage());
+                    Log.e("BmobBatch()","操作失败"+e.getMessage());
                 }
             }
         });
     }
     private void logOut(){
+        //即使通讯连接断开
+        BmobIM.getInstance().disConnect();
+        //用户注销登录
         BmobUser.logOut();
         BmobUser currentUser=BmobUser.getCurrentUser();
         if(currentUser==null){
             ToastUitls.showShortToast(getApplicationContext(),"退出成功");
             startActivity(new Intent(MainActivity.this,LoginActivity.class));
         }
+    }
+    private void queryApplyInfo(){
+        BmobQuery<RoomInfo> query=new BmobQuery<RoomInfo>();
+        applyRoomList=new ArrayList<RoomInfo>();
+        query.addWhereEqualTo("stateOfRoom","申请中");
+        query.setLimit(2017);
+        query.findObjects(new FindListener<RoomInfo>() {
+            @Override
+            public void done(List<RoomInfo> list, BmobException e) {
+                if(e==null){
+                    for(RoomInfo info:list){
+                        applyRoomList.add(info);
+                    }
+                }
+            }
+        });
     }
 }

@@ -27,7 +27,7 @@ public class SplashActivity extends AppCompatActivity {
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.layout_splash);
         //初始化bmobSDK
-        Bmob.initialize(this,"de3f9cdf2a992d3e894dbb11e99bbedf");
+//        Bmob.initialize(this,"de3f9cdf2a992d3e894dbb11e99bbedf");
         //判断当前手机SDK版本,如果大于1，就将本页面设置为状态栏设置为沉浸式状态栏模式。
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
