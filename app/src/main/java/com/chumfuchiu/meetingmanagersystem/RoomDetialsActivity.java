@@ -84,10 +84,15 @@ public class RoomDetialsActivity extends BaseActivity {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                String roomID;
                 if(state.equals("空闲中")){
                     //判断当前用户是否预约过教室，如果预约过教室，就不让他预约。
                     userInfo=BmobUser.getCurrentUser(UserInfo.class);
-                    if(!userInfo.getRoomID().isEmpty()){
+                    roomID=userInfo.getRoomID();
+                    if(roomID==null){
+                        roomID="";
+                    }
+                    if(!roomID.isEmpty()){
                         ToastUitls.showLongToast(getApplicationContext(),"您正在预约一个教室或您有预约的教室正在使用中,不能重复预约。");
                         return;
                     }

@@ -558,6 +558,7 @@ public class MainActivity extends AppCompatActivity {
             roomInfo.setPersonsOfRoom(size);
             roomInfo.setNumberOfRoom(num);
             roomInfo.setResourceOfRoom(source);
+            roomInfo.setStateOfRoom("空闲中");
             roomInfo.save(new SaveListener<String>() {
                 @Override
                 public void done(String s, BmobException e) {

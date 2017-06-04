@@ -14,8 +14,11 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.chumfuchiu.meetingmanagersystem.bean.MessageEvent;
 import com.chumfuchiu.meetingmanagersystem.bean.RoomInfo;
 import com.chumfuchiu.meetingmanagersystem.utils.ToastUitls;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,12 +96,14 @@ public class ApplyHandleActivity extends AppCompatActivity {
             public void done(BmobException e) {
                 if(e==null){
                     ToastUitls.showLongToast(getApplicationContext(),"操作成功");
+                    EventBus.getDefault().post(new MessageEvent());
                 }else {
                     ToastUitls.showLongToast(getApplicationContext(),"操作失败");
                 }
             }
         });
     }
+    //电脑空调电冰箱
     private void disagreeApply(RoomInfo roomInfo){
         roomInfo.setUsingPersonAvatar("");
         roomInfo.setUsingPerson("");
@@ -111,6 +116,7 @@ public class ApplyHandleActivity extends AppCompatActivity {
             public void done(BmobException e) {
                 if(e==null){
                     ToastUitls.showLongToast(getApplicationContext(),"操作成功");
+                    EventBus.getDefault().post(new MessageEvent());
                 }else {
                     ToastUitls.showLongToast(getApplicationContext(),"操作失败");
                 }

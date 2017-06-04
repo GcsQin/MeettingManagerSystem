@@ -39,7 +39,8 @@ public class UserApplyActivity extends AppCompatActivity {
         initView();
         userInfo= BmobUser.getCurrentUser(UserInfo.class);
         roomID=userInfo.getRoomID();
-        if(roomID.isEmpty()){
+        if(roomID==null){
+            roomID="";
             rlRoot.setBackgroundResource(R.drawable.not_apply);
             button.setText("好");
             roomIDFIsEmpty=true;
@@ -158,6 +159,7 @@ public class UserApplyActivity extends AppCompatActivity {
                 if(e==null){
                     ToastUitls.showLongToast(getApplicationContext(),"操作成功");
                     EventBus.getDefault().post(new MessageEvent());
+                    startActivity(new Intent(UserApplyActivity.this,MainActivity.class));
                 }else {
                     ToastUitls.showLongToast(getApplicationContext(),"操作失败,"+e.getMessage());
                 }
