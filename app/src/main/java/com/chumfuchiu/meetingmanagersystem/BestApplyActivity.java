@@ -111,6 +111,7 @@ public class BestApplyActivity extends AppCompatActivity {
                     Log.e("List<BmobQuery>","查询到"+list.size()+"条数据");
                     if(list.size()==0){
                         imageView.setVisibility(View.VISIBLE);
+                        listView.setVisibility(View.INVISIBLE);
                     }else {
                         showListView(list);
                     }
@@ -123,6 +124,7 @@ public class BestApplyActivity extends AppCompatActivity {
     private void showListView(final List<RoomInfo> xlist){
         listView.setAdapter(new BestQueryAdapter(xlist));
         listView.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.INVISIBLE);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

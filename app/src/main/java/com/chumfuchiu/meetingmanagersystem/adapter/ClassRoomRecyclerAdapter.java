@@ -58,6 +58,7 @@ public class ClassRoomRecyclerAdapter extends RecyclerView.Adapter<ClassRoomRecy
         }else if (roomInfo.getStateOfRoom().equals("申请中")){
             holder.rootView.setBackgroundColor(Color.parseColor("#FEC7DE"));
         }else {
+            Log.e("color====",roomInfo.getStateOfRoom());
             holder.rootView.setBackgroundColor(Color.parseColor("#ff0000"));
         }
         holder.itemView.setTag(position);
@@ -96,11 +97,12 @@ public class ClassRoomRecyclerAdapter extends RecyclerView.Adapter<ClassRoomRecy
         }
         return false;
     }
-    public void addItem(final int position){
+    public void addItem(final int position,RoomInfo roomInfo){
         if(mRoomInfoArrayList==null){
             mRoomInfoArrayList=new ArrayList<RoomInfo>();
         }
-//        mRoomInfoArrayList.add()
+        mRoomInfoArrayList.add(0,roomInfo);
+        this.notifyItemRangeChanged(0,mRoomInfoArrayList.size()-1);
     }
     public void deleteItem(){
 

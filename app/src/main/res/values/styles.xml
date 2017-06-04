@@ -56,4 +56,11 @@
     <style name="style_text_1e1e1e" parent="style_text">
         <item name="android:textColor">@color/color_1e1e1e</item>
     </style>
+
+    <style name="style_text_black" parent="style_text">
+        <item name="android:textColor">@color/base_color_text_black</item>
+    </style>
+    <style name="style_text_gray_small" parent="style_text_small">
+        <item name="android:textColor">@color/color_99</item>
+    </style>
 </resources>

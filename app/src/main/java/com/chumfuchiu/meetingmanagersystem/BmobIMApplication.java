@@ -1,6 +1,7 @@
 package com.chumfuchiu.meetingmanagersystem;
 
 import android.app.Application;
+import android.content.Context;
 import android.util.Log;
 
 import com.chumfuchiu.meetingmanagersystem.chat.ChatMessageHandler;
@@ -26,9 +27,11 @@ public class BmobIMApplication extends Application {
     private static void setBmobIMApplication(BmobIMApplication a) {
         BmobIMApplication.INSTANCE = a;
     }
+    private static Context context;
     @Override
     public void onCreate() {
         super.onCreate();
+        context=getApplicationContext();
         setInstance(this);
         if(getApplicationInfo().packageName.equals(getMyProcessName())){
             Log.e("BmobIMApplication",""+getApplicationInfo()+getPackageName());
@@ -53,4 +56,7 @@ public class BmobIMApplication extends Application {
             return null;
         }
     }
+    public static Context getMYContext(){
+        return context;
+    };
 }

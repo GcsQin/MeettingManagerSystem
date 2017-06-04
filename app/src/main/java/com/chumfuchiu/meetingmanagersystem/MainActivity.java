@@ -71,8 +71,8 @@ public class MainActivity extends AppCompatActivity {
     UserInfo userInfo;
     Integer permission;
     MenuListAdapter menuListAdapter;
-    String[] user=new String[]{"邮箱中心","我预约的","最佳预约","退出登录"};
-    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","预约管理","一键空闲","添加教室","退出登录"};
+    String[] user=new String[]{"邮箱中心","我预约的","最佳预约","退出登录","我的信息"};
+    String[] admin=new String[]{"邮箱中心","我预约的","最佳预约","预约管理","一键空闲","一键禁用","添加教室","退出登录"};
     //更新对话框
     EditText etBuild,etRoomNum,etSource,etState,etSize;
     Boolean isUpdateSuccess=null;
@@ -84,6 +84,8 @@ public class MainActivity extends AppCompatActivity {
     EditText etAddRommNum,etAddSource,etAddState,etAddSize;
     Button btnAddNewRoom;
     String adDBuild="";
+    //
+    List<UserInfo> userInfos;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -320,19 +322,12 @@ public class MainActivity extends AppCompatActivity {
                 roomUpSource=etUpRoomSource.getText().toString();
                 roomUpState=etUpState.getText().toString();
                 upSize=etUpSize.getText().toString();
-               updateRoomInfo(roomUpSource,roomUpState,upSize,roomInfo,position);
-                if(isUpdateSuccess){
-                    ToastUitls.showLongToast(getApplicationContext(),"更新成功");
-                    dialog.dismiss();
-                }else {
-                    ToastUitls.showLongToast(getApplicationContext(),"更新失败");
-                    dialog.dismiss();
-                }
+               updateRoomInfo(roomUpSource,roomUpState,upSize,roomInfo,position,dialog);
             }
         });
         dialog.show();
     }
-    private Boolean updateRoomInfo(String source, String state, String size, RoomInfo roomInfo, final int position){
+    private Boolean updateRoomInfo(String source, String state, String size, RoomInfo roomInfo, final int position, final Dialog dialog){
             if(!source.isEmpty()){
                 roomInfo.setResourceOfRoom(source);
             }
@@ -350,9 +345,13 @@ public class MainActivity extends AppCompatActivity {
                              roomRecyclerAdapter.notifyItemRemoved(position);
                              roomRecyclerAdapter.notifyDataSetChanged();
                              isUpdateSuccess=true;
+                             ToastUitls.showLongToast(getApplicationContext(),"更新成功");
+                             dialog.dismiss();
                              Log.e("updateRoomInfo","==="+isUpdateSuccess);
                          }else {
                              isUpdateSuccess=false;
+                             ToastUitls.showLongToast(getApplicationContext(),"更新失败");
+                             dialog.dismiss();
                              Log.e("updateRoomInfo","==="+isUpdateSuccess);
                          }
                 }
@@ -390,6 +389,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case 3:
                     logOut();
+                    break;
+                case 4:
+                    enterConversationAct();
                     break;
 
             }
@@ -463,10 +465,15 @@ public class MainActivity extends AppCompatActivity {
                     Log.e("======","oneKeyRelease();");
                     break;
                 case 5:
+                    oneKeyCanNotUse();
+                    drawerLayout.closeDrawers();
+                    Log.e("========","oneKeyCanNotUse()");
+                    break;
+                case 6:
                     addNewClassRoom();
                     Log.e("======","addNewClassRoom()");
                     break;
-                case 6:
+                case 7:
                     logOut();
                     break;
             }
@@ -482,6 +489,46 @@ public class MainActivity extends AppCompatActivity {
         for(int i=0;i<roomInfoArrayList.size();i++){
             RoomInfo roomInfo=roomInfoArrayList.get(i);
             roomInfo.setStateOfRoom("空闲中");
+            roomInfo.setUsingTime("");
+            roomInfo.setUsingPerson("");
+            roomInfo.setUsingReason("");
+            roomInfo.setUsingPersonid("");
+            roomInfo.setUsingPersonAvatar("");
+            roomInfos.add(roomInfo);
+        }
+        new BmobBatch().updateBatch(roomInfos).doBatch(new QueryListListener<BatchResult>() {
+            @Override
+            public void done(List<BatchResult> list, BmobException e) {
+                if(e==null){
+                    Log.e("BmobBatch()","======操作成功");
+                    Log.e("BmobBatch()","=========size"+list.size());
+                    for(int j=0;j<list.size();j++){
+                        BatchResult result=list.get(j);
+                        BmobException ex=result.getError();
+                        if(ex!=null) {
+                            ToastUitls.showLongToast(getApplicationContext(),"一键空闲操作失败(部分数据不成功)");
+                            Log.e("BmobBatch","ex========部分数据不成功"+j);
+                        }else {
+                            Log.e("BmobBatch","ex========部分数据成功"+j);
+                            roomRecyclerAdapter.notifyItemChanged(j);
+                            if(j==list.size()-1){
+                                roomRecyclerAdapter.notifyDataSetChanged();
+                                ToastUitls.showShortToast(getApplicationContext(),"操作成功");
+                            }
+                        }
+                    }
+                }else {
+                    ToastUitls.showLongToast(getApplicationContext(),"操作失败"+e.getMessage());
+                    Log.e("BmobBatch()","操作失败"+e.getMessage());
+                }
+            }
+        });
+    }
+    private void oneKeyCanNotUse(){
+        List<BmobObject> roomInfos=new ArrayList<BmobObject>();
+        for(int i=0;i<roomInfoArrayList.size();i++){
+            RoomInfo roomInfo=roomInfoArrayList.get(i);
+            roomInfo.setStateOfRoom("禁用中");
             roomInfo.setUsingTime("");
             roomInfo.setUsingPerson("");
             roomInfo.setUsingReason("");
@@ -553,7 +600,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void addAnewRoom(String adDBuild, String num, int size, String source, final Dialog dialog){
         if(!num.isEmpty()&&size>=0&&!num.isEmpty()&&!source.isEmpty()){
-            RoomInfo roomInfo=new RoomInfo();
+            final RoomInfo roomInfo=new RoomInfo();
             roomInfo.setBuildingOfRoom(adDBuild);
             roomInfo.setPersonsOfRoom(size);
             roomInfo.setNumberOfRoom(num);
@@ -563,6 +610,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void done(String s, BmobException e) {
                     if(e==null){
+                        roomRecyclerAdapter.addItem(0,roomInfo);
+                        roomRecyclerAdapter.notifyItemInserted(0);
+                        roomRecyclerAdapter.notifyDataSetChanged();
                         ToastUitls.showLongToast(getApplicationContext(),"添加教室成功！");
                         dialog.dismiss();
                     }else {
@@ -602,5 +652,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-
+    private void enterConversationAct(){
+        startActivity(new Intent(MainActivity.this,ConversationActivity.class));
+    }
 }

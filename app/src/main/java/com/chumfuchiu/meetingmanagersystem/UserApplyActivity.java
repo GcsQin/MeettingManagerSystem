@@ -51,6 +51,12 @@ public class UserApplyActivity extends AppCompatActivity {
     }
     private void  queryRoomDataAndViewVisable(final String roomID){
         BmobQuery<RoomInfo> query=new BmobQuery<>();
+        if(roomID==null|roomID.isEmpty()){
+            rlRoot.setBackgroundResource(R.drawable.not_apply);
+            button.setText("好");
+            roomIDFIsEmpty=true;
+            return;
+        }
         query.getObject(roomID, new QueryListener<RoomInfo>() {
             @Override
             public void done(RoomInfo roomInfo, BmobException e) {

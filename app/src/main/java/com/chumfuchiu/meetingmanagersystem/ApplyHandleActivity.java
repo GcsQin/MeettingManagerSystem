@@ -90,13 +90,14 @@ public class ApplyHandleActivity extends AppCompatActivity {
         dialog.show();
     }
     private void agreeApply(RoomInfo roomInfo){
-        roomInfo.setStateOfRoom("占中中");
+        roomInfo.setStateOfRoom("使用中");
         roomInfo.update(roomInfo.getObjectId(), new UpdateListener() {
             @Override
             public void done(BmobException e) {
                 if(e==null){
                     ToastUitls.showLongToast(getApplicationContext(),"操作成功");
                     EventBus.getDefault().post(new MessageEvent());
+                    startActivity(new Intent(ApplyHandleActivity.this,MainActivity.class));
                 }else {
                     ToastUitls.showLongToast(getApplicationContext(),"操作失败");
                 }

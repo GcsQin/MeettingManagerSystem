@@ -39,6 +39,7 @@
         <EditText
             style="@style/RegisterEditText"
             android:hint="（必填）"
+            android:inputType="textPassword"
             android:id="@+id/register_pass"
             />
         <TextView
